@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>第17章 计算机体系结构基础</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="styles.css" type="text/css" 
+</head>
+<body>
+<h2>第26章 数码像框</h2>
+<ul>
+	<li><h3>第一节 计算机体系结构概述</h3>
+		<ol>
+			<li>复习前面的知识点。</li>
+			<li>冯 诺伊曼与哈佛结构。</li>
+			<li>CPU的功能单元及其工作原理： <br>
+			寄存器register保存不同类型的数据，如ESP栈寻址。 <br>
+			程序计数器PC,保存下一条指令的地址.<br>
+			指令译码器instruction decoder：读取的数据转换为指令的对应操作。<br> 
+			算数逻辑单元ALU：根据不同的指令做运算。<br> 
+			地址和数据总线bus：链接cpu与内存。<br></li>
+			<li>计算机的发展过程：<br>
+			1.最初的计算机只有ALU和register,数据输入靠打孔的纸带，只能计算加法.<br>
+			2.要想作其他的计算，必须把我们的要求告诉计算机，于是出现了Instruction Decoder.<br>
+			3.如果想让计算机按照一定的流程工作，需要将编写一个指令集合，并且
+			有一个标志指名程序执行到什么地方了，于是出现了PC.<br>
+			4.要想让计算机做复杂事情，很多数据需要记录下来，寄存器显得太小了。
+			于是引入内存，并且用总线将天CPU相连。</li>
+	
+		</ol>		
+	</li>
+	<li><h3>第二节 指令的执行过程</h3>
+		<ol>
+			<li>指令执行的过程，对编程没直接影响。但可以把握计算机体系架构</li>
+			<li>32位处理器，什么是32？ <br>
+			A. addr bus 32bit 。<br>
+			B. data bus or register 32bit <br>
+			C 指令的长度 。<br>
+			result：</li>
+			<li>指令执行过程</li>
+			<li></li>
+		</ol>
+	</li>
+	<li><h3>第三节 设备</h3>
+		<ol>
+			<li>总线的是什么。</li>
+			<li>arm与x86访问设备的指令不同，x86设备有对立的地址空间。</li>
+			<li>x86硬盘设备数据的读写是挂在IDE,SATA,SCI总线上，
+			指令在存在硬盘上无法执行，程序加载到内存中，就成为进程。操作系统本身也是个程序。</li>
+			<li>访问内存与访问设备有所不同，比如读取串口上的数据。</li>
+			<li>驱动程序是操作设备的代码。</li>
+		</ol>
+	</li>
+	<li><h3>第四节 MMU</h3>
+		<ol>
+			<li></li>
+		</ol>
+	</li>
+</ul>
+</body>
+</html>
