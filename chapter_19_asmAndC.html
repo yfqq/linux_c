@@ -11,7 +11,8 @@
 	<li><h3>第一节 栈与栈帧</h3>
 		<ol>
 			<li>复习前面的知识点。</li>
-			<li>本节用到的知识旧点 -g objdump -dS</li>
+			<li>本节用到的知识旧点 -g objdump -dS,主要探讨函数的
+			调用过程。</li>
 			<li>讲述过程：有大体的认识->反汇编分析<br>
 			栈是一块内存存储空间，分配栈这块虚拟地址空间的位置由系统完成，
 			linux中，将虚拟内存分为两部分，内核区与用户区，内核区占用高1GB
@@ -89,7 +90,36 @@
 			函数退出后又调用了库函数exit, exit调用了_exit.可以概括为
 			exit(main(argc, argv))。<br>
 			</li>
+			<li>通过调试来确定函数的调用关系:<br>
+			_start -> __libc_start_main@plt -> __libc_start_main -> main -> 
+			exit.</li>
 
+		</ol>
+	</li>
+	<li><h3>第四节 变量的存储布局</h3>
+		<ol>
+			<li>
+				<p class="example-contents"><pre>
+#include &lt;stdio.h&gt;
+
+const int A = 10;
+int a = 20;
+static int b = 30;
+int c;
+
+int main(void)
+{
+	static int a = 40;
+	char b[] = "Hello world";
+	register int c = 50;
+
+	printf("Hello world %d\n", c);
+
+	return 0;
+}
+				</pre></p>
+				<li></li>
+			</li>
 		</ol>
 	</li>
 </ul>
