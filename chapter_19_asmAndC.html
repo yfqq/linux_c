@@ -16,7 +16,13 @@
 			栈是一块内存存储空间，分配栈这块虚拟地址空间的位置由系统完成，
 			linux中，将虚拟内存分为两部分，内核区与用户区，内核区占用高1GB
 			剩下的3GB是用户区域。用户区又分成几个部分。栈就是其中的一个部分。
-			与其他部分相比，栈是3GB中地址最高的一个部分。<br>
+			与其他部分相比，栈是3GB中地址最高的一个部分。
+			<p align="left">
+			<p><b>图19_1 栈所在位置</b></p>
+			<p><img src="img/19_stack_position.png" 
+			width="240" height="320" border="0" alt="" ></p>
+			</p>
+			<br>
 			栈帧：一个函数被调用，就会在栈这个块空间中划分一个连续的区域。所以说
 			栈是对一个正在运行的程序而言，栈帧是针对一个程序中的函数而言。<br>
 			当函数被调用时分配栈帧，当函数退出时，栈帧释放。</li>
@@ -32,10 +38,59 @@
 			栈底用EBP指向。栈是向底地址生长的，所以EBP总是大于等于ESP。注意：
 			实参并不是存放在栈底与栈顶的中间，下边我们会作验证。</li>
 			<li>栈内存放的数据有：局部变量，参数，指令跳转地址，以及栈顶栈底指针。</li>
-			<li>影响到栈内数据与栈指针变化的指令：call ret pop push leave mov</li>
+			<li>影响到栈内数据与栈指针变化的指令： push pop  call ret leave mov</li>
+			<li>
+			push xxx : <br>
+			subl $4, %esp <br>
+			movl xxx, (%esp) <br>
+			<br>
+			pop xxx :<br>
+			movl xxx, (%esp) <br>
+			addl $4, %esp <br>
+			<br>
+			call xxx:<br>
+			push %eip <br>
+			jmp xxx<br>
+			<br>
+			ret :pop eip, (实际==jmp eip)<br>
+			<br>
+			leave:
+			恢复当前函数执行前的栈顶栈底指向。
+			</li>
 		</ol>
 	</li>
-	<li><h3>第三节 </h3>
+	<li><h3>第三节  main函数和启动例程</h3>
+		<ol>
+			<li>为什么汇编程序的入口是_start，而C程序的入口是main函数呢？
+			本节就来解释这个问题。</li>
+			<li>汇编程序编译：<br>
+			as hello.s -o hello.o<br>
+			ld hello.o -o app<br>			
+			c语言的编译过程:<br>
+			gcc -S main.c -o main.s<br>
+			gcc -c main.s -o main.o<br>
+			gcc main.o -o app
+			<p align = "left">
+			<p><b>图19_2 c程序编译过程</b></p>
+			<p><img src="img/19_2_gcc.png" width="330" height="179" border="0" alt=""></p>
+			</p></li>
+			<li>如果执行 gcc hello.o -o app,会提示_start重复定义，main未定义。<br>
+			_start的定义，一个是由我们的汇编代码提供的，另一个定义来自/usr/lib/crt1.o；
+			从最后一行还可以看出这些错误提示是由ld给出的。由此可见，如果我们用gcc做链接，
+			gcc其实是调用ld将目标文件crt1.o和我们的hello.o链接在一起。crt1.o里面已经提供了
+			_start入口点，我们的汇编程序中再实现一个_start就是多重定义了，链接器不知道该用哪个，只好报错。
+			另外，crt1.o提供的_start需要调用main函数，而我们的汇编程序中没有实现
+			main函数，所以报错。</li>	
+			<li>结论：gcc是编译的外壳，gcc main.o 实际上是调用了ld main.o /usr/
+			lib/crt1.o /usr/lib/crti.o /usr/lib/crtn.o -lc -dynamic-linker
+			/lib/ld-linux.so.2. 实际gcc还调用了其他的库文件，我们可以通过gcc -v查看，
+			这里不作更深探讨。<br>
+			crt1.o中的_start函数执行了初始化工作，我们称其为启动例程，然后调用main.o中的main函数。main
+			函数退出后又调用了库函数exit, exit调用了_exit.可以概括为
+			exit(main(argc, argv))。<br>
+			</li>
+
+		</ol>
 	</li>
 </ul>
 </body>
