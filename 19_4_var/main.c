@@ -4,7 +4,8 @@ const int A = 10;
 int a = 20;
 static int b = 30;
 int c;
-
+int C[200];
+char d[] = "HELLO WORLD";
 int main(void)
 {
         static int a = 40;
