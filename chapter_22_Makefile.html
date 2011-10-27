@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>第22章 Makefile</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="styles.css" type="text/css" 
+</head>
+<body>
+<h2>第22章 预处理</h2>
+<ul>
+	<li><h3>第一节 Makefile中的基本元素--规则</h3>
+		<ol>
+			<li>复习前面的知识点。</li>
+			<li>Makefile的作用，源代码中.c文件较少，直接用命令可以编译成为目标，
+			当代码量非常大，比如linux内核代码，代码量超十万行，.c文件成百上千，手动编译就不可以了。
+			Makefile可以帮助我们编译代码，不管代码量多大，只要用make指令编译，就可以按写好的
+			Makefile进行编译。</li>
+			<li>Makefile可以写的很复杂，也可以只写几行，但组成的基本单元是规则。
+			也就是任何Makefile都是由若干规则构成。我们写一个例子来说明。
+			<pre class="programlisting">
+//main.c			
+#include &lt;stdio.h&gt;
+int main(void)
+{
+	printf("hello world\n");
+	return 0;
+}			
+			</pre>
+			编写一个只有一条规则Makefile来编译这个源文件main.c,并且Makefile和源文件要在相同的目录下。
+			<pre class="programlisting">
+all:main.c			
+	gcc main.c -o app -g -Wall
+			</pre>
+			在源文件目录下，用make指令编译，和我们用命令行：gcc main.c -o app -g -Wall完全一样。
+			所以，可以吧Makefile看成编译命令集的脚本。<br>
+			以上脚本，只有一条规制，我们可以总结，规则的构成：目标 + 依赖 + 命令。<br>
+			在以上脚本中，三者分别是。<br>
+			目标：all<br>
+			依赖：main.c<br>
+			命令：gcc main.c -o app -g -Wall<br>
+			需要注意：<br>
+			目标和依赖中间要用：分割，命令前必须用table缩进。<br>
+			目标是用来标识规则的，与规则生成的文件名称没关系。<br>
+			在同一条规则中，命令可以写多条，依赖可以写多个，但目标一般只有一个。			
+			那是否一个Makefile只有能生成一个可执行文件，当然不是了，通过多条规则，可以生成多个
+			.o文件或多个可执行文件。
+			</li>
+		</ol>
+	<li><h3>第二节 构建Makefile中规则树</h3>
+		<ol>
+			<li>在上一节写Makefile中，只有一条规则，这样的编写方式可以生成需要的
+			的可执行文件，如果有两个源文件：
+			<pre class="programlisting">
+//main.c
+#include &lt;stdio.h&gt;
+extern int add(int a, int b);
+int main(void)
+{
+	int result;
+	result = add(1, 3);
+	printf("result = %d\n", result);
+	return 0;
+}
+			</pre>
+			<pre class="programlisting">
+//cal.c			
+int add(int a, int b)
+{
+	return a + b;
+}
+			</pre>
+			用同样的方法，可以吧Makefile写成：
+			<pre class="programlisting">
+all:main.c cal.c			
+	gcc main.c cal.c -o app -g -Wall
+
+			</pre>
+
+			但这种写法效率不是最高的，原因很简单，如果其中一个源文件修改了，就需要重新
+			编译一遍，为了实现编译过程中，少作重复性的工作，我们重新编写Makefile如下：
+			<pre class="programlisting">
+all:main.o cal.o
+	gcc main.o cal.o -o app
+main.o:main.c
+	gcc -c main.c -o main.o
+cal.o:cal.c
+	gcc -c cal.c -o cal.o
+			</pre>	
+			以上Makefile中，存在3条规则，第一条描述了，工作的总目标，要生成app,
+			但前提是main.o cal.o必须存在，可以看作是规则树的根。 
+			第二条规则main.o可以生成main.o, 可以看作是跟的一个分支。
+			第三条规则cal.o可以生成cal.o的另一个分支。<br>
+			与上一个Makefile相比，现在如果修改其中的main.c, 用make编译，会发现
+			第一条和第二条规则中的命名被执行了，第三条规则的命令没有执行。
+			通过上面分析，可以总结如下：<br>
+			1 规则之间是有相互关系的，关系是由依赖的名称，和目比的名称建立的。<br>
+			2 规则树是倒置的，一条规则的分支规则要写在这条规则的后面，顺序颠倒了是否可以，
+			读者自行验证。<br>
+			3 分支目标的名字，一般写成和生成的文件相同，如果不相同也是可以的，但一般很少人
+			这样写。另外一个原因是，这样的写法，在没有修改源文件的情况下，每条规则都要
+			重新执行一遍，原因是，一条规则是否执行，判断条件是依赖目标的修改时间，如果目标的
+			修改时间更晚，那么这条规则没必要执行。<br>
+
+			<pre class="programlisting">
+all:a b
+	gcc main.o cal.o -o app
+a:main.c
+	gcc -c main.c -o main.o
+b:cal.c
+	gcc -c cal.c -o cal.o
+			
+			</pre><br>
+			</li>
+			<li>大部分的规则间都相互联系的，但不全是，我们在上面的Makefile中加一条孤立规则：
+			<pre class="programlisting">
+all:main.o cal.o
+	gcc main.o cal.o -o app
+main.o:main.c
+	gcc -c main.c -o main.o
+cal.o:cal.c
+	gcc -c cal.c -o cal.o
+clean:
+	rm -f *.o
+	rm -f app		
+			</pre>
+			新加的规则中含有两条命令，很明显，这条规则与其他规则没任何关系，这条孤立规则在
+			make过成中，不被执行。<br>
+			当make指令被执行时，会确定一个总目标，总目标可以指定，如果不指定，
+			Makefile中的第一条规则，会被默认为总目标。
+			make指令并不是把Makefile中所以的规则都执行，而是执行总目标规则，以及总目标规则
+			的子规则。<br>
+			如果要让clean这条新加的规则执行，必须指定总目标，用make clean来执行。
+			</li>	 
+		</ol> 
+	</li>
+
+	<li><h3>第三节 隐含规则与模式规则</h3>
+		<ol>
+			<li>变量：</li>
+			<li>如果把以上的Makefile修改一下，去掉规则中的命令，测试能否编译：
+			<pre class="programlisting">			
+all:main.o cal.o
+	gcc main.o cal.o -o app
+main.o:main.c
+cal.o:cal.c
+clean:
+	rm -f *.o
+	rm -f app				
+			</pre>
+			没有了命令的两条规则，同样能被执行，实际上系统提供了隐含规则。
+			通过make -p 可以查看。
+			</li>
+			<li>除了隐含规则外，还有模式规则，
+			模式规则中要用到几个特殊的变量：<br>
+			$@规则中的目标，$<规则中的第一个依赖， $<规则中所有的依赖。<br>
+			模式规则的作用是将同类型的操作用一个通用的
+			格式表述，也就是，用一种语法表示多个同类型的规则，模式规则有很多种。以.c编译为.o
+			来说明。第二，第三条规则都是将.c编译为.o，如果用模式规则可以表示为<br>
+			%.o:%.c，修改上面Makefile，加上模式规则：
+			<pre class="programlisting">			
+all:main.o cal.o
+	gcc main.o cal.o -o app
+%.o:%.c
+	gcc $<  -c -o $@
+clean:
+	rm -f *.o
+	rm -f app				
+			</pre>
+			</li>
+		</ol>
+	</li>
+					
+</ul>
+</body>
+</html>

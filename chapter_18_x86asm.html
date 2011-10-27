@@ -16,8 +16,12 @@
 			却是错误的。</li>
 			<li>x86中的寄存器。</li>
 			<li>例子代码分析，系统调用，LINUX int 80 , dos int 21.
-			语法不要求掌握。</li>
-			<li>linux 系统调用表 /usr/include/i386-linux-gnu/asm/unistd_32.h <br>
+			当int80被执行时，会进行一次跳转，跳转到内核中执行，但是内核非常庞大，
+			到底执行内核中的哪个函数，由寄存器EAX中的数值决定，<br>
+			如果是1，会调用exit的系统调用，<br>
+			如果EAX的值是4，会调用write的系统调用，<br>
+			到底那个系统调用对应EAX的多少数值，可以查看系统调用表。</li>
+			<li>linux 系统调用表 /usr/include/asm/unistd_32.h <br>
 			或 /usr/include/asm/unistd.h。 </li>
 			<li>段 ：.text .data .global = .globl _start。</li>
 		</ol>
@@ -38,7 +42,7 @@
 			<li>文件中的每个字节代表的意义，是通用的格式，就好像每张JPG图像，如果符合
 			JPG通用格式，就能打开。到底每个字节代表什么意思，没必要记住，分析的方法是借助工具
 			readelf -a，根据readelf显示的结构对照文件的内容来分析。</li>
-			<li>定位8个vsection的具体地址。</li>
+			<li>定位8个section的具体地址。</li>
 		</ol>
 	</li>
 	<li><h3>第四节 elf结构</h3>
